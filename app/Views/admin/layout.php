@@ -83,6 +83,12 @@
                             <span>Services</span>
                         </a>
                     </li>
+                    <li class="<?= isset($page) && $page == 'cars' ? 'active' : ''; ?>">
+                        <a href="<?= base_url('admin/coded-cars'); ?>">
+                            <i class="fa fa-car"></i>
+                            <span>Coded Cars</span>
+                        </a>
+                    </li>
                     <li class="<?= isset($page) && $page == 'bookings' ? 'active' : ''; ?>">
                         <a href="<?= base_url('admin/bookings'); ?>">
                             <i class="fa fa-calendar"></i>
@@ -95,6 +101,7 @@
                             <span>Contact Inquiries</span>
                         </a>
                     </li>
+
                 </ul>
             </section>
             <!-- /.sidebar -->

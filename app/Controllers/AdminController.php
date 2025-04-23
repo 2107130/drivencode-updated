@@ -19,9 +19,22 @@ class AdminController extends Controller
 
     public function index()
     {
+        $serviceModel = new \App\Models\ServiceModel();
+        $bookingModel = new \App\Models\BookingModel();
+        $contactModel = new \App\Models\ContactModel();
+
         $data = [
             'page' => 'dashboard',
+            'totalServices' => $serviceModel->countAllResults(),
+            'availableServices' => $serviceModel->where('service_availability', 1)->countAllResults(),
+            'totalAppointments' => $bookingModel->countAllResults(),
+            'pendingAppointments' => $bookingModel->where('status', 'pending')->countAllResults(),
+            'completedAppointments' => $bookingModel->where('status', 'completed')->countAllResults(),
+            'activeAppointments' => $bookingModel->where('status', 'confirmed')->countAllResults(),
+            'cancelledAppointments' => $bookingModel->where('status', 'cancelled')->countAllResults(),
+            'totalInquiries' => $contactModel->countAllResults()
         ];
+
 
         return view('admin/index', $data);
     }
@@ -236,7 +249,192 @@ class AdminController extends Controller
 
 
 
+    public function bookings()
+    {
+        $bookingModel = new \App\Models\BookingModel();
+        $bookings = $bookingModel->getAllBookingsWithService();
 
+        return view('admin/bookings', [
+            'page' => 'bookings',
+            'bookings' => $bookings
+        ]);
+    }
+
+    public function updateServiceBookingtatus($id)
+    {
+        $bookingModel = new \App\Models\BookingModel();
+        $booking = $bookingModel->find($id);
+
+        if ($booking) {
+            $bookingModel->update($id, [
+                'status' => $this->request->getPost('status')
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('toastr', [
+                'type' => 'success',
+                'message' => 'Service Booking status updated'
+            ]);
+    }
+
+    public function deleteServiceBooking($id)
+    {
+        $bookingModel = new \App\Models\BookingModel();
+        $booking = $bookingModel->find($id);
+
+        if ($booking) {
+            $bookingModel->delete($id);
+        }
+
+        return redirect()->back()
+            ->with('toastr', [
+                'type' => 'success',
+                'message' => 'Service Booking deleted successfully'
+            ]);
+    }
+
+
+    public function contact_quires()
+    {
+
+        $contactModel = new \App\Models\ContactModel();
+
+        $data = [
+            'page' => 'customers',
+            'inquiries' => $contactModel->orderBy('created_at', 'DESC')->findAll()
+        ];
+
+        return view('admin/contact_quires', $data);
+    }
+
+    public function deleteInquiry($id)
+    {
+        $contactModel = new \App\Models\ContactModel();
+        $inquiry = $contactModel->find($id);
+
+        if (!$inquiry) {
+            return redirect()->back()
+                ->with('toastr', [
+                    'type' => 'error',
+                    'message' => 'Inquiry not found'
+                ]);
+        }
+
+        $contactModel->delete($id);
+
+        return redirect()->back()
+            ->with('toastr', [
+                'type' => 'success',
+                'message' => 'Inquiry deleted successfully'
+            ]);
+    }
+
+
+    /// coded cars
+
+
+    public function coded_cars()
+    {
+        $carModel = new \App\Models\CodedCarModel();
+
+        $data = [
+            'page' => 'cars',
+            'cars' => $carModel->findAll()
+        ];
+
+        return view('admin/coded_cars', $data);
+    }
+
+    public function add_new_coded_car()
+    {
+        $data = [
+            'page' => 'cars'
+        ];
+
+        return view('admin/add_new_coded_car', $data);
+    }
+
+    public function coded_car_store()
+    {
+        $validation = \Config\Services::validation();
+
+        $rules = [
+            'coded_car_name' => 'required|max_length[255]',
+            'coded_car_image' => [
+                'rules' => 'uploaded[coded_car_image]|max_size[coded_car_image,5120]|is_image[coded_car_image]',
+                'label' => 'Coded Car Image'
+            ],
+            'coded_car_description' => 'required|min_length[10]',
+            'coded_car_date' => 'required|valid_date' // New validation rule for date
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        $imageFile = $this->request->getFile('coded_car_image');
+        $imageName = '';
+
+        if ($imageFile->isValid() && !$imageFile->hasMoved()) {
+            $imageName = $imageFile->getRandomName();
+            $imageFile->move(ROOTPATH . 'public/uploads/coded_cars', $imageName);
+        }
+
+        $carData = [
+            'coded_car_name' => $this->request->getPost('coded_car_name'),
+            'coded_car_description' => $this->request->getPost('coded_car_description'),
+            'coded_car_image' => $imageName,
+            'coded_car_date' => $this->request->getPost('coded_car_date') // Save the coded car date
+        ];
+
+        $carModel = new \App\Models\CodedCarModel();
+
+        if ($carModel->save($carData)) {
+            return redirect()->to('/admin/coded-cars')
+                ->with('toastr', [
+                    'type' => 'success',
+                    'message' => 'Coded car added successfully!'
+                ]);
+        }
+
+        return redirect()->back()
+            ->withInput()
+            ->with('toastr', [
+                'type' => 'error',
+                'message' => 'Failed to add coded car. Please try again.'
+            ]);
+    }
+
+    public function coded_car_delete($id)
+    {
+        $carModel = new \App\Models\CodedCarModel();
+        $car = $carModel->find($id);
+
+        if (!$car) {
+            return redirect()->to('/admin/coded-cars')->with('toastr', [
+                'type' => 'error',
+                'message' => 'Coded car not found.'
+            ]);
+        }
+
+        // Delete the car image (if exists)
+        if (!empty($car['coded_car_image']) && file_exists(ROOTPATH . 'public/uploads/coded_cars/' . $car['coded_car_image'])) {
+            unlink(ROOTPATH . 'public/uploads/coded_cars/' . $car['coded_car_image']);
+        }
+
+        if ($carModel->delete($id)) {
+            return redirect()->to('/admin/coded-cars')->with('toastr', [
+                'type' => 'success',
+                'message' => 'Coded car deleted successfully.'
+            ]);
+        }
+
+        return redirect()->to('/admin/coded-cars')->with('toastr', [
+            'type' => 'error',
+            'message' => 'Failed to delete coded car. Please try again.'
+        ]);
+    }
 
 
 

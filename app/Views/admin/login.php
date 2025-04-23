@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login | Admin-Drive'N'Code</title>
+    <title>Login | Admin-Cruise Line Rentals</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 
     <link href="<?= base_url('bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet" type="text/css" />
@@ -23,8 +23,8 @@
 <body class="login-page">
     <div class="login-box">
         <div class="login-logo">
-            <img src="<?= base_url('logo.png'); ?>" height="50px" alt="Logo"> <br>
-            <a class="mt-2" href="<?= base_url(); ?>">Admin <b>Login</b></a>
+            <img src="<?= base_url('logo.png'); ?>" height="150px" alt="Logo"> <br>
+            <a class="mt-2 text-success" href="<?= base_url(); ?>">Admin Login</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
             <p class="login-box-msg">Sign in to start your session</p>
@@ -53,13 +53,6 @@
                 <?php endif; ?>
 
                 <div class="row mt-4">
-                    <div class="col-xs-8">
-                        <div class="checkbox icheck">
-                            <label>
-                                <input type="checkbox"> Remember Me
-                            </label>
-                        </div>
-                    </div>
                     <div class="col-xs-4">
                         <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
                     </div>
