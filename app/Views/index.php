@@ -23,8 +23,6 @@
               <p class="hero-text">
                 Transform your driving experience through advanced vehicle coding. We specialize in ECU tuning, software customization, and activating hidden features to optimize your car's performance and capabilities.
               </p>
-              <a href="<?= base_url('make-appointment') ?>" class="vs-btn style16">
-                Schedule Coding Service
               </a>
             </div>
           </div>
@@ -45,8 +43,6 @@
               <p class="hero-text">
                 From LED light configurations to advanced driver assistance systems, we program your vehicle's software to match your unique preferences and driving style.
               </p>
-              <a href="<?= base_url('make-appointment') ?>" class="vs-btn style16">
-                Schedule Coding Service
               </a>
             </div>
           </div>
@@ -67,8 +63,6 @@
               <p class="hero-text">
                 Professional coding services for enhanced diagnostics, module programming, and electronic system optimization. Keep your car's software updated with the latest features and improvements.
               </p>
-              <a href="<?= base_url('make-appointment') ?>" class="vs-btn style16">
-                Schedule Coding Service
               </a>
             </div>
           </div>
@@ -120,7 +114,14 @@
     </div>
     <?php if ($totalCodedCars > count($codedCars)): ?>
       <div class="text-center mt-4">
-        <button id="loadMoreBtn" class="btn btn-outline-primary" data-offset="6">Load More</button>
+      <button
+  id="loadMoreBtn"
+  data-offset="6"
+  class="bg-[#89CFF0] hover:bg-[#74b8e6] text-white px-4 py-2 rounded"
+>
+  Load More
+</button>
+
       </div>
     <?php endif; ?>
 
